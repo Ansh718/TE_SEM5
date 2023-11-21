@@ -102,7 +102,9 @@ bool Scheduler::compareArrivalTime(Job x, Job y)
 
 void Scheduler::display()
 {
-    cout << "\nProcess ID | Arrival Time | Burst Time | Completion Time | Turn-Around Time | Wait Time " << endl;
+    cout << "\n-----------------------------------------------------------------------------------------------";
+    cout << "\nProcess ID | Arrival Time | Burst Time | Completion Time | Turn-Around Time | Wait Time ";
+    cout << "\n-----------------------------------------------------------------------------------------------\n";
     for (int i = 0; i < n; i++)
     {
         cout << "    " << jobs[i].iD << "\t\t" << jobs[i].arrival << "\t\t" << jobs[i].burst << "\t\t" << jobs[i].completionTime << "\t\t" << jobs[i].turnAroundTime << "\t\t" << jobs[i].waiting << "\n"
@@ -119,15 +121,14 @@ void Scheduler::display()
     avg_WaitingTime /= n;
     cout << "Average waiting time :->" << avg_WaitingTime << endl;
     cout << "Average turn around time :->" << avg_TurnAroundTime << endl;
+    cout << "------------------------------------------------------------------------------------------------\n";
 }
 
 void Scheduler::displayForPriority()
 {
+    cout << "\n-------------------------------------------------------------------------------------------------------";
     cout << "\nProcess ID | Arrival Time | Burst Time | Completion Time | Turn-Around Time | Wait Time | Priority";
-    for (int i = 0; i < n; i++)
-    {
-        cout << "    " << jobs[i].iD << "\t\t" << jobs[i].arrival << "\t\t" << jobs[i].burst << "\t\t" << jobs[i].completionTime << "\t\t" << jobs[i].turnAroundTime << "\t\t" << jobs[i].waiting << "\t\t" << jobs[i].priority << endl;
-    }
+    cout << "\n-------------------------------------------------------------------------------------------------------\n";
     float avg_WaitingTime = 0;
     float avg_TurnAroundTime = 0;
     for (int i = 0; i < n; i++)
@@ -139,6 +140,12 @@ void Scheduler::displayForPriority()
     avg_WaitingTime /= n;
     cout << "Average waiting time :->" << avg_WaitingTime << endl;
     cout << "Average turn around time :->" << avg_TurnAroundTime << endl;
+    cout << "------------------------------------------------------------------------------------------------\n";
+    for (int i = 0; i < n; i++)
+    {
+        cout << "    " << jobs[i].iD << "\t\t" << jobs[i].arrival << "\t\t" << jobs[i].burst << "\t\t" << jobs[i].completionTime << "\t\t" << jobs[i].turnAroundTime << "\t\t" << jobs[i].waiting << "\t\t" << jobs[i].priority << endl;
+    }
+    cout << "-------------------------------------------------------------------------------------------------------\n";
 }
 
 void Scheduler::firstComeFirstServe()
@@ -268,25 +275,31 @@ void Scheduler::priority()
     }
     int currentTime = 0;
     int completedTasks = 0;
+    int completionTime = 0;
+    int highPriority = 0;
+    int remainingBurst = 0;
+    int maxPriority = INT_MAX;
+    bool taskActive = false;
     while (completedTasks != n)
     {
-        int highPriority = -1;
-        int maxPriority = INT_MAX;
         for (int i = 0; i < n; i++)
         {
             if (jobs[i].arrival <= currentTime && remainingTime[i] > 0 && jobs[i].priority < maxPriority)
             {
                 highPriority = i;
                 maxPriority = jobs[i].priority;
+                taskActive = true;
             }
         }
-        if (highPriority == -1)
+        if (!taskActive)
         {
             currentTime++;
             continue;
         }
         currentTime += jobs[highPriority].burst;
         remainingTime[highPriority] = 0;
+        maxPriority = INT_MAX;
+        taskActive = false;
         completedTasks++;
         jobs[highPriority].completionTime = currentTime;
         jobs[highPriority].turnAroundTime = jobs[highPriority].completionTime - jobs[highPriority].arrival;
